@@ -17,7 +17,7 @@ const makeAddPerson = (): AddPerson => {
       const fakePerson = {
         id: 1,
         name: 'valid_name',
-        email: 'valid_email@email.com',
+        email: 'valid_email@mail.com',
         birthDate: '2000-01-01'
       }
 
@@ -175,6 +175,27 @@ describe('SignUp Controller', () => {
     expect(addSpy).toHaveBeenCalledWith({
       name: 'Nome da pesssoa',
       email: 'any_email@mail.com',
+      birthDate: '2000-01-01'
+    })
+  })
+
+  test('Should return 200 if valid data is provided', () => {
+    const { sut } = makeSut() // system under test
+    const httpRequest = {
+      body: {
+        name: 'valid_name',
+        email: 'valid_email@mail.com',
+        birthDate: '2000-01-01'
+      }
+
+    }
+    const httpResponse = sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({
+      id: 1,
+      name: 'valid_name',
+      email: 'valid_email@mail.com',
       birthDate: '2000-01-01'
     })
   })
