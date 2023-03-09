@@ -4,13 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll --collectCoverage"
+    "test": "jest",
+    "test:staged": "jest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-standard": "^5.0.0",
     "express": "^4.18.2"
   },
   "devDependencies": {
@@ -24,6 +23,8 @@
     "eslint-config-standard-with-typescript": "^34.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-standard": "^5.0.0",
     "git-commit-msg-linter": "^4.8.3",
     "husky": "^8.0.3",
     "jest": "^29.5.0",
