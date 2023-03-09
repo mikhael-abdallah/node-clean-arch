@@ -1,6 +1,7 @@
 import { SignUpController } from './signup'
 import { MissingParamError, InvalidParamError, ServerError } from '../../errors'
-import { type AddPerson, type AddPersonModel, type EmailValidator, type PersonModel } from './signup-protocols'
+import { AddPerson, AddPersonModel, EmailValidator, PersonModel } from './signup-protocols'
+import * as SignUpProtocols from './signup-protocols'
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStup implements EmailValidator {
@@ -44,6 +45,10 @@ const makeSut = (): SutTypes => {
 }
 
 describe('SignUp Controller', () => {
+  test('Should import signUp protocols', () => {
+    expect(typeof SignUpProtocols).toBe('object')
+  })
+
   test('Should return 400 if no name is provided', async () => {
     const { sut } = makeSut() // system under test
     const httpRequest = {

@@ -1,4 +1,4 @@
-import { type PersonModel } from '../models/person'
+import { PersonModel } from '../models/person'
 
 export interface AddPersonModel {
   name: string
