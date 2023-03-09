@@ -1,6 +1,10 @@
 # node-clean-arch
 node clean architecture
 
+Diagrama: https://drive.google.com/file/d/1909hGwbne7PSu2mqvbOdvRjH5Rs_8oxo/view?usp=sharing
+
+https://app.diagrams.net/#G1909hGwbne7PSu2mqvbOdvRjH5Rs_8oxo
+
 Desenvolva uma api onde seja possível:
 
 - Cadastrar turmas, os alunos de cada turma e as disciplinas de cada turma.
