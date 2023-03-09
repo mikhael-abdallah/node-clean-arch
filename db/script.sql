@@ -1,6 +1,7 @@
 CREATE TABLE person (
     id INT IDENTITY PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
+    email VARCHAR(200) NOT NULL,
     birth_date DATE NULL,
     creation_date DATE NOT NULL DEFAULT GETDATE(),
     change_date DATE NOT NULL DEFAULT GETDATE(),
