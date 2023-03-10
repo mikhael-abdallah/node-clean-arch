@@ -68,7 +68,7 @@ describe('DbAddPerson Usecase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  test('Should return an account on success', async () => {
+  test('Should return a person on success', async () => {
     const { sut } = makeSut()
 
     const personData = {
