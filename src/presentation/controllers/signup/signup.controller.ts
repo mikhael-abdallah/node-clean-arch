@@ -40,8 +40,12 @@ export class SignUpController implements Controller {
       })
 
       return ok(person)
-    } catch (error) {
-      return serverError()
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return serverError(error)
+      } else {
+        return serverError()
+      }
     }
   }
 }
