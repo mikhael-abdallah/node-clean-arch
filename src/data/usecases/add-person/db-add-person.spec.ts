@@ -5,18 +5,28 @@ import * as addPersonProtocols from './db-add-person-protocols'
 const makeAddPersonRepository = (): AddPersonRepository => {
   class AddPersonRepositoryStub implements AddPersonRepository {
     async add (personDate: AddPersonModel): Promise<PersonModel> {
-      const fakePerson = {
-        id: 1,
-        name: 'valid_name',
-        email: 'valid_email',
-        birthDate: '2000-01-01'
-      }
-      return new Promise(resolve => { resolve(fakePerson) })
+      return new Promise(resolve => { resolve(makeFakePerson()) })
     }
   }
 
   return new AddPersonRepositoryStub()
 }
+
+const makeFakePerson = (): PersonModel => ({
+  id: 1,
+  name: 'valid_name',
+  email: 'valid_email',
+  birthDate: '2000-01-01'
+})
+
+const makeFakePersonData = (): AddPersonModel => (
+  {
+    name: 'valid_name',
+    email: 'valid_email',
+    birthDate: '2000-01-01'
+  }
+
+)
 
 interface SutTypes {
   sut: DbAddPerson
@@ -38,12 +48,7 @@ describe('DbAddPerson Usecase', () => {
     const { sut, addPersonRepositoryStub } = makeSut()
     const addSpy = jest.spyOn(addPersonRepositoryStub, 'add')
 
-    const personData = {
-      name: 'valid_name',
-      email: 'valid_email',
-      birthDate: '2000-01-01'
-    }
-    await sut.add(personData)
+    await sut.add(makeFakePersonData())
     expect(addSpy).toHaveBeenCalledWith({
       name: 'valid_name',
       email: 'valid_email',
@@ -58,12 +63,7 @@ describe('DbAddPerson Usecase', () => {
       new Promise((resolve, reject) => { reject(new Error()) })
     )
 
-    const personData = {
-      name: 'valid_name',
-      email: 'valid_email',
-      birthDate: '2000-01-01'
-    }
-    const promise = sut.add(personData)
+    const promise = sut.add(makeFakePersonData())
 
     await expect(promise).rejects.toThrow()
   })
@@ -71,19 +71,8 @@ describe('DbAddPerson Usecase', () => {
   test('Should return a person on success', async () => {
     const { sut } = makeSut()
 
-    const personData = {
-      name: 'valid_name',
-      email: 'valid_email',
-      birthDate: '2000-01-01'
-    }
+    const person = await sut.add(makeFakePersonData())
 
-    const person = await sut.add(personData)
-
-    expect(person).toEqual({
-      id: 1,
-      name: 'valid_name',
-      email: 'valid_email',
-      birthDate: '2000-01-01'
-    })
+    expect(person).toEqual(makeFakePerson())
   })
 })
