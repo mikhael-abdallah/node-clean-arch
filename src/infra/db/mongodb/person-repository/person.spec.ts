@@ -13,7 +13,7 @@ describe('Person Mongo Repository', () => {
   })
 
   beforeEach(async () => {
-    const personCollection = MongoHelper.getCollection('person')
+    const personCollection = await MongoHelper.getCollection('person')
     await personCollection.deleteMany({})
   })
 
