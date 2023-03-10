@@ -12,6 +12,11 @@ describe('Person Mongo Repository', () => {
     await MongoHelper.disconnect()
   })
 
+  beforeEach(async () => {
+    const personCollection = MongoHelper.getCollection('person')
+    await personCollection.deleteMany({})
+  })
+
   const makeSut = (): PersonMongoRepository => {
     return new PersonMongoRepository()
   }
