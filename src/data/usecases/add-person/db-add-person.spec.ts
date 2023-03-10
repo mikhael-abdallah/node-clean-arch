@@ -50,4 +50,21 @@ describe('DbAddPerson Usecase', () => {
       birthDate: '2000-01-01'
     })
   })
+
+  test('Should throw if DbAddPersonRepository throws', async () => {
+    const { sut, addPersonRepositoryStub } = makeSut()
+
+    jest.spyOn(addPersonRepositoryStub, 'add').mockReturnValueOnce(
+      new Promise((resolve, reject) => { reject(new Error()) })
+    )
+
+    const personData = {
+      name: 'valid_name',
+      email: 'valid_email',
+      birthDate: '2000-01-01'
+    }
+    const promise = sut.add(personData)
+
+    await expect(promise).rejects.toThrow()
+  })
 })
