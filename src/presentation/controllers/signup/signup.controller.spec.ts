@@ -1,7 +1,8 @@
 import { SignUpController } from './signup.controller'
 import { MissingParamError, InvalidParamError, ServerError } from '../../errors'
-import { AddPerson, AddPersonModel, EmailValidator, PersonModel } from './signup-protocols'
+import { HttpRequest, AddPerson, AddPersonModel, EmailValidator, PersonModel } from './signup-protocols'
 import * as SignUpProtocols from './signup-protocols'
+import { badRequest, ok, serverError } from '../../helpers/http-helper'
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStup implements EmailValidator {
@@ -15,18 +16,26 @@ const makeEmailValidator = (): EmailValidator => {
 const makeAddPerson = (): AddPerson => {
   class AddPersonStub implements AddPerson {
     async add (Person: AddPersonModel): Promise<PersonModel> {
-      const fakePerson = {
-        id: 1,
-        name: 'valid_name',
-        email: 'valid_email@mail.com',
-        birthDate: '2000-01-01'
-      }
-
-      return new Promise(resolve => { resolve(fakePerson) })
+      return new Promise(resolve => { resolve(makeFakePerson()) })
     }
   }
   return new AddPersonStub()
 }
+
+const makeFakePerson = (): PersonModel => ({
+  id: 1,
+  name: 'valid_name',
+  email: 'valid_email@mail.com',
+  birthDate: '2000-01-01'
+})
+
+const makeFakeRequest = (): HttpRequest => ({
+  body: {
+    name: 'any_name',
+    email: 'any_email@mail.com',
+    birthDate: '2000-01-01'
+  }
+})
 
 interface SutTypes {
   sut: SignUpController
@@ -60,8 +69,7 @@ describe('SignUp Controller', () => {
 
     }
     const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('name'))
+    expect(httpResponse).toEqual(badRequest(new MissingParamError('name')))
   })
 
   test('Should return 400 if no email is provided', async () => {
@@ -75,24 +83,16 @@ describe('SignUp Controller', () => {
 
     }
     const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('email'))
+
+    expect(httpResponse).toEqual(badRequest(new MissingParamError('email')))
   })
 
   test('Should return 400 if an invalid email is provided', async () => {
     const { sut, emailValidatorStub } = makeSut() // system under test
     jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
-    const httpRequest = {
-      body: {
-        name: 'Nome da pesssoa',
-        email: 'invalid_email@mail.com',
-        birthDate: '2000-01-01'
-      }
+    const httpResponse = await sut.handle(makeFakeRequest())
 
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new InvalidParamError('email'))
+    expect(httpResponse).toEqual(badRequest(new InvalidParamError('email')))
   })
 
   test('Should return 400 if an birthDate confirmation fails', async () => {
@@ -106,22 +106,14 @@ describe('SignUp Controller', () => {
 
     }
     const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new InvalidParamError('birthDate'))
+
+    expect(httpResponse).toEqual(badRequest(new InvalidParamError('birthDate')))
   })
 
   test('Should call EmailValidator with correct email', async () => {
     const { sut, emailValidatorStub } = makeSut() // system under test
     const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    const httpRequest = {
-      body: {
-        name: 'Nome da pesssoa',
-        email: 'any_email@mail.com',
-        birthDate: '2000-01-01'
-      }
-
-    }
-    await sut.handle(httpRequest)
+    await sut.handle(makeFakeRequest())
     expect(isValidSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 
@@ -132,17 +124,8 @@ describe('SignUp Controller', () => {
       throw new Error()
     })
 
-    const httpRequest = {
-      body: {
-        name: 'Nome da pesssoa',
-        email: 'any_email@mail.com',
-        birthDate: '2000-01-01'
-      }
-
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(serverError(new ServerError()))
   })
 
   test('Should return 500 if AddPerson throws', async () => {
@@ -152,33 +135,17 @@ describe('SignUp Controller', () => {
       return new Promise((resolve, reject) => { reject(new Error()) })
     })
 
-    const httpRequest = {
-      body: {
-        name: 'Nome da pesssoa',
-        email: 'any_email@mail.com',
-        birthDate: '2000-01-01'
-      }
+    const httpResponse = await sut.handle(makeFakeRequest())
 
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse).toEqual(serverError(new ServerError()))
   })
 
   test('Should call AddPerson with correct values', async () => {
     const { sut, addPersonStub } = makeSut() // system under test
     const addSpy = jest.spyOn(addPersonStub, 'add')
-    const httpRequest = {
-      body: {
-        name: 'Nome da pesssoa',
-        email: 'any_email@mail.com',
-        birthDate: '2000-01-01'
-      }
-
-    }
-    await sut.handle(httpRequest)
+    await sut.handle(makeFakeRequest())
     expect(addSpy).toHaveBeenCalledWith({
-      name: 'Nome da pesssoa',
+      name: 'any_name',
       email: 'any_email@mail.com',
       birthDate: '2000-01-01'
     })
@@ -186,22 +153,8 @@ describe('SignUp Controller', () => {
 
   test('Should return 200 if valid data is provided', async () => {
     const { sut } = makeSut() // system under test
-    const httpRequest = {
-      body: {
-        name: 'valid_name',
-        email: 'valid_email@mail.com',
-        birthDate: '2000-01-01'
-      }
+    const httpResponse = await sut.handle(makeFakeRequest())
 
-    }
-    const httpResponse = await sut.handle(httpRequest)
-
-    expect(httpResponse.statusCode).toBe(200)
-    expect(httpResponse.body).toEqual({
-      id: 1,
-      name: 'valid_name',
-      email: 'valid_email@mail.com',
-      birthDate: '2000-01-01'
-    })
+    expect(httpResponse).toEqual(ok(makeFakePerson()))
   })
 })
