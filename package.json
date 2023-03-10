@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/validator": "^13.7.13",
     "express": "^4.18.2",
     "validator": "^13.9.0"
   },
@@ -24,6 +23,7 @@
     "@types/jest": "^29.4.0",
     "@types/node": "^18.14.6",
     "@types/supertest": "^2.0.12",
+    "@types/validator": "^13.7.13",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
     "@typescript-eslint/parser": "^5.54.1",
     "eslint": "^8.35.0",
