@@ -67,4 +67,23 @@ describe('DbAddPerson Usecase', () => {
 
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return an account on success', async () => {
+    const { sut } = makeSut()
+
+    const personData = {
+      name: 'valid_name',
+      email: 'valid_email',
+      birthDate: '2000-01-01'
+    }
+
+    const person = await sut.add(personData)
+
+    expect(person).toEqual({
+      id: 1,
+      name: 'valid_name',
+      email: 'valid_email',
+      birthDate: '2000-01-01'
+    })
+  })
 })
