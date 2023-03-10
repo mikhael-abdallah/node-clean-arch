@@ -8,10 +8,6 @@ export class PersonMongoRepository implements AddPersonRepository {
     const personCollection = MongoHelper.getCollection('person')
     const result = await personCollection.insertOne(personData)
     const person = result.ops[0]
-    const { _id, ...personWithoutId } = person
-    return {
-      ...personWithoutId,
-      id: _id
-    }
+    return MongoHelper.map(person)
   }
 }
