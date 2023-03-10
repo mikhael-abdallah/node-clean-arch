@@ -1,10 +1,16 @@
-import { AddPerson, AddPersonModel, PersonModel } from './db-add-person-protocols'
+import { AddPerson, AddPersonModel, AddPersonRepository, PersonModel } from './db-add-person-protocols'
 
 export class DbAddPerson implements AddPerson {
-  async add (person: AddPersonModel): Promise<PersonModel> {
+  constructor (private readonly addPersonRepository: AddPersonRepository) {
+
+  }
+
+  async add (personData: AddPersonModel): Promise<PersonModel> {
+    await this.addPersonRepository.add(personData)
+
     return new Promise(resolve => {
       resolve({
-        ...person,
+        ...personData,
         id: 1
       })
     })
