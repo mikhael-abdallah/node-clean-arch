@@ -1,5 +1,6 @@
 import { DbAddPerson } from './db-add-person'
 import { AddPersonModel, AddPersonRepository, PersonModel } from './db-add-person-protocols'
+import * as addPersonProtocols from './db-add-person-protocols'
 
 const makeAddPersonRepository = (): AddPersonRepository => {
   class AddPersonRepositoryStub implements AddPersonRepository {
@@ -29,6 +30,10 @@ const makeSut = (): SutTypes => {
 }
 
 describe('DbAddPerson Usecase', () => {
+  test('Should import addPerson protocols', () => {
+    expect(typeof addPersonProtocols).toBe('object')
+  })
+
   test('Should call AddPersonRepository with correct values', async () => {
     const { sut, addPersonRepositoryStub } = makeSut()
     const addSpy = jest.spyOn(addPersonRepositoryStub, 'add')
