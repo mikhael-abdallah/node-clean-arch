@@ -2,7 +2,7 @@ CREATE TABLE person (
     id INT IDENTITY PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
     email VARCHAR(200) NOT NULL,
-    birth_date DATE NULL,
+    birth_date DATE NOT NULL,
     creation_date DATE NOT NULL DEFAULT GETDATE(),
     change_date DATE NOT NULL DEFAULT GETDATE(),
 )
@@ -10,7 +10,7 @@ CREATE TABLE person (
 CREATE TABLE bin_person (
     id INT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
-    birth_date DATE NULL,
+    birth_date DATE NOT NULL,
     creation_date DATE NOT NULL,
     change_date DATE NOT NULL DEFAULT GETDATE(),
     deactivation_date DATE NOT NULL DEFAULT GETDATE(),
@@ -93,4 +93,9 @@ CREATE TABLE bin_studyloads (
     PRIMARY KEY (discipline_id, school_class_id),
     creation_date DATE NOT NULL DEFAULT GETDATE(),
     deactivation_date DATE NOT NULL DEFAULT GETDATE(),
+)
+
+CREATE TABLE log_error (
+    message VARCHAR(1000),
+    creation_date DATE NOT NULL DEFAULT(GETDATE()),
 )
