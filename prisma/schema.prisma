@@ -1,0 +1,116 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+  binaryTargets   = ["native", "darwin", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DB_URL")
+}
+
+model bin_discipline {
+  id                Int      @id(map: "PK__bin_disc__3213E83F183DB9A8")
+  name              String   @db.VarChar(100)
+  teacher_id        Int
+  creation_date     DateTime @default(now(), map: "DF__bin_disci__creat__30C33EC3") @db.Date
+  change_date       DateTime @default(now(), map: "DF__bin_disci__chang__31B762FC") @updatedAt @db.Date
+  deactivation_date DateTime @default(now(), map: "DF__bin_disci__deact__32AB8735") @db.Date
+}
+
+model bin_person {
+  id                Int       @id(map: "PK__bin_pers__3213E83FD7A9DCF4")
+  name              String    @db.VarChar(200)
+  birth_date        DateTime? @db.Date
+  creation_date     DateTime  @db.Date
+  change_date       DateTime  @default(now(), map: "DF__bin_perso__chang__1EA48E88") @updatedAt @db.Date
+  deactivation_date DateTime  @default(now(), map: "DF__bin_perso__deact__1F98B2C1") @db.Date
+}
+
+model bin_school_class {
+  id                Int      @id(map: "PK__bin_scho__3213E83F8AA718C2")
+  name              String   @db.VarChar(100)
+  creation_date     DateTime @default(now(), map: "DF__bin_schoo__creat__2739D489") @db.Date
+  change_date       DateTime @default(now(), map: "DF__bin_schoo__chang__282DF8C2") @updatedAt @db.Date
+  deactivation_date DateTime @default(now(), map: "DF__bin_schoo__deact__29221CFB") @db.Date
+}
+
+model bin_student {
+  id                Int      @id(map: "PK__bin_stud__3213E83F5D2AF511")
+  register_code     String   @db.Char(10)
+  creation_date     DateTime @default(now(), map: "DF__bin_stude__creat__22751F6C") @db.Date
+  change_date       DateTime @default(now(), map: "DF__bin_stude__chang__236943A5") @updatedAt @db.Date
+  deactivation_date DateTime @default(now(), map: "DF__bin_stude__deact__245D67DE") @db.Date
+}
+
+model bin_studyloads {
+  discipline_id     Int
+  school_class_id   Int
+  creation_date     DateTime @default(now(), map: "DF__bin_study__creat__3587F3E0") @db.Date
+  deactivation_date DateTime @default(now(), map: "DF__bin_study__deact__367C1819") @db.Date
+
+  @@id([discipline_id, school_class_id], map: "PK__bin_stud__426C58154862705A")
+}
+
+model bin_teacher {
+  id                Int      @id(map: "PK__bin_teac__3213E83F0FCEF471")
+  graduation        String   @db.VarChar(200)
+  creation_date     DateTime @default(now(), map: "DF__bin_teach__creat__2BFE89A6") @db.Date
+  change_date       DateTime @default(now(), map: "DF__bin_teach__chang__2CF2ADDF") @updatedAt @db.Date
+  deactivation_date DateTime @default(now(), map: "DF__bin_teach__deact__2DE6D218") @db.Date
+}
+
+model discipline {
+  id            Int          @id(map: "PK__discipli__3213E83F430A4F9C") @default(autoincrement())
+  name          String       @db.VarChar(100)
+  teacher_id    Int
+  creation_date DateTime     @default(now(), map: "DF__disciplin__creat__0C85DE4D") @db.Date
+  change_date   DateTime     @default(now(), map: "DF__disciplin__chang__0D7A0286") @updatedAt @db.Date
+  teacher       teacher      @relation(fields: [teacher_id], references: [id], onUpdate: NoAction, map: "FK__disciplin__teach__0B91BA14")
+  studyloads    studyloads[]
+}
+
+model person {
+  id            Int       @id(map: "PK__person__3213E83F1AEE5BD7") @default(autoincrement())
+  name          String    @db.VarChar(200)
+  birth_date    DateTime? @db.Date
+  creation_date DateTime  @default(now(), map: "DF__person__creation__68487DD7") @db.Date
+  change_date   DateTime  @default(now(), map: "DF__person__change_d__693CA210") @updatedAt @db.Date
+  student       student?
+  teacher       teacher?
+}
+
+model school_class {
+  id            Int          @id(map: "PK__school_c__3213E83FBB2544A5") @default(autoincrement())
+  name          String       @db.VarChar(100)
+  creation_date DateTime     @default(now(), map: "DF__school_cl__creat__797309D9") @db.Date
+  change_date   DateTime     @default(now(), map: "DF__school_cl__chang__7A672E12") @updatedAt @db.Date
+  studyloads    studyloads[]
+}
+
+model student {
+  id            Int      @id(map: "PK__student__3213E83FAFEDDC1C")
+  register_code String   @db.Char(10)
+  creation_date DateTime @default(now(), map: "DF__student__creatio__70DDC3D8") @db.Date
+  change_date   DateTime @default(now(), map: "DF__student__change___71D1E811") @updatedAt @db.Date
+  person        person   @relation(fields: [id], references: [id], onUpdate: NoAction, map: "FK__student__id__6FE99F9F")
+}
+
+model studyloads {
+  discipline_id   Int
+  school_class_id Int
+  creation_date   DateTime     @default(now(), map: "DF__studyload__creat__17036CC0") @db.Date
+  discipline      discipline   @relation(fields: [discipline_id], references: [id], onUpdate: NoAction, map: "FK__studyload__disci__151B244E")
+  school_class    school_class @relation(fields: [school_class_id], references: [id], onUpdate: NoAction, map: "FK__studyload__schoo__160F4887")
+
+  @@id([discipline_id, school_class_id], map: "PK__studyloa__426C5815049CBAB7")
+}
+
+model teacher {
+  id            Int          @id(map: "PK__teacher__3213E83F86111320")
+  graduation    String       @db.VarChar(200)
+  creation_date DateTime     @default(now(), map: "DF__teacher__creatio__02FC7413") @db.Date
+  change_date   DateTime     @default(now(), map: "DF__teacher__change___03F0984C") @updatedAt @db.Date
+  discipline    discipline[]
+  person        person       @relation(fields: [id], references: [id], onUpdate: NoAction, map: "FK__teacher__id__02084FDA")
+}
