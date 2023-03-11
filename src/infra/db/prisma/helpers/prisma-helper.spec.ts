@@ -1,5 +1,5 @@
-
-import { PrismaHelper as sut } from './prisma-helper'
+import prismaHelper from './prisma-helper'
+const sut = prismaHelper
 
 describe('Prisma Helper', () => {
   beforeAll(async () => {
@@ -11,10 +11,10 @@ describe('Prisma Helper', () => {
   })
 
   test('Should reconnect if prisma is down', async () => {
-    let personTable = await sut.getTable('person')
-    expect(personTable).toBeTruthy()
+    let testConnection = await (await sut.getClient()).$queryRaw`SELECT 1`
+    expect(testConnection).toBeTruthy()
     await sut.disconnect()
-    personTable = await sut.getTable('person')
-    expect(personTable).toBeTruthy()
+    testConnection = await (await sut.getClient()).$queryRaw`SELECT 1`
+    expect(testConnection).toBeTruthy()
   })
 })
