@@ -22,6 +22,6 @@ class PrismaHelperMock implements PrismaHelperInterface {
   }
 }
 
-const prismaHelper = new PrismaHelperMock()
+const prismaHelperMock = new PrismaHelperMock()
 
-export default prismaHelper
+export default prismaHelperMock

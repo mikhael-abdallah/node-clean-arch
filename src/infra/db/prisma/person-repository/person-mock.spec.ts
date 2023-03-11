@@ -1,28 +1,28 @@
 
 import { PersonPrismaRepository } from './person'
-import prismaHelper from '../helpers/prisma-helper-mock'
+import prismaHelperMock from '../helpers/prisma-helper-mock'
 
 describe('Person Prisma Repository', () => {
   beforeAll(async () => {
-    await prismaHelper.connect()
+    await prismaHelperMock.connect()
   })
 
   afterAll(async () => {
-    await prismaHelper.disconnect()
+    await prismaHelperMock.disconnect()
   })
 
   beforeEach(async () => {
-    await prismaHelper.disconnect()
-    await prismaHelper.connect()
+    await prismaHelperMock.disconnect()
+    await prismaHelperMock.connect()
   })
 
   const makeSut = (): PersonPrismaRepository => {
-    return new PersonPrismaRepository(prismaHelper)
+    return new PersonPrismaRepository(prismaHelperMock)
   }
 
   test('Should return an person on success', async () => {
     const sut = makeSut()
-    const client = await prismaHelper.getClient()
+    const client = await prismaHelperMock.getClient()
 
     client.person.create.mockResolvedValueOnce({
       birth_date: new Date('2000-01-01'),
