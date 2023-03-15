@@ -1,4 +1,4 @@
-import { MissingParamError } from '../../errors'
+import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, ok } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 import { IntValidator } from '../../protocols/id-validator'
@@ -12,7 +12,10 @@ export class LinkStudentController implements Controller {
       return badRequest(new MissingParamError('id'))
     }
 
-    this.intValidator.isValid(httpRequest.body.id)
+    const isValid = this.intValidator.isValid(httpRequest.body.id)
+    if (!isValid) {
+      return badRequest(new InvalidParamError('id'))
+    }
 
     return ok({})
   }
