@@ -1,5 +1,5 @@
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest } from '../../helpers/http-helper'
+import { badRequest, serverError } from '../../helpers/http-helper'
 import { HttpRequest } from '../../protocols'
 import { IntValidator } from '../../protocols/id-validator'
 import { LinkStudentController } from './link-student.controller'
@@ -56,5 +56,15 @@ describe('Link Student Controller', () => {
     const isValidSpy = jest.spyOn(intValidatorStub, 'isValid')
     await sut.handle(makeFakeRequest())
     expect(isValidSpy).toHaveBeenCalledWith(3)
+  })
+
+  test('Should return 500 if IntValidator throws', async () => {
+    const { sut, intValidatorStub } = makeSut()
+    jest.spyOn(intValidatorStub, 'isValid').mockImplementationOnce(() => {
+      throw new Error()
+    })
+
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(serverError())
   })
 })
