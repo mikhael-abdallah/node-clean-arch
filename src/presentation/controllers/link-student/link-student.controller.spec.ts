@@ -1,5 +1,5 @@
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, serverError } from '../../helpers/http-helper'
+import { badRequest, notFound, serverError } from '../../helpers/http-helper'
 import { HttpRequest } from '../../protocols'
 import { IntValidator } from '../../protocols/id-validator'
 import { RegisterCodeValidator } from '../../protocols/register-code-validator'
@@ -128,5 +128,13 @@ describe('Link Student Controller', () => {
     const linkSpy = jest.spyOn(linkStudentPersonStub, 'link')
     await sut.handle(makeFakeRequest())
     expect(linkSpy).toHaveBeenCalledWith(3, '0123456789')
+  })
+
+  test('Should return 404 if id not found', async () => {
+    const { sut, linkStudentPersonStub } = makeSut()
+    jest.spyOn(linkStudentPersonStub, 'link').mockReturnValueOnce(new Promise(resolve => { resolve(false) }))
+
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(notFound())
   })
 })
