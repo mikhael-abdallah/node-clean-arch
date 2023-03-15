@@ -85,6 +85,13 @@ describe('Link Student Controller', () => {
     expect(httpResponse).toEqual(badRequest(new InvalidParamError('registerCode')))
   })
 
+  test('Should call RegisterCodeValidator with correct value', async () => {
+    const { sut, registerCodeValidator } = makeSut()
+    const isValidSpy = jest.spyOn(registerCodeValidator, 'isValid')
+    await sut.handle(makeFakeRequest())
+    expect(isValidSpy).toHaveBeenCalledWith('0123456789')
+  })
+
   test('Should call IntValidator with correct id', async () => {
     const { sut, intValidatorStub } = makeSut()
     const isValidSpy = jest.spyOn(intValidatorStub, 'isValid')
@@ -100,5 +107,12 @@ describe('Link Student Controller', () => {
 
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError())
+  })
+
+  test('Should call RegisterCodeValidator with correct value', async () => {
+    const { sut, registerCodeValidator } = makeSut()
+    const isValidSpy = jest.spyOn(registerCodeValidator, 'isValid')
+    await sut.handle(makeFakeRequest())
+    expect(isValidSpy).toHaveBeenCalledWith('0123456789')
   })
 })
