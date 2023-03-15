@@ -37,7 +37,7 @@ export class LinkStudentController implements Controller {
         return notFound()
       }
 
-      return ok({})
+      return ok({ success: hasLinked })
     } catch (error: unknown) {
       if (error instanceof Error) {
         return serverError(error)
