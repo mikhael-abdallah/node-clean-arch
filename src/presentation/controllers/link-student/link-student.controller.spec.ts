@@ -1,5 +1,5 @@
 import { MissingParamError, InvalidParamError, ServerError } from '../../errors'
-import { badRequest, serverError, notFound } from '../../helpers/http-helper'
+import { badRequest, serverError, notFound, ok } from '../../helpers/http-helper'
 import { IntValidator, LinkStudentPerson, RegisterCodeValidator, HttpRequest } from './link-student-protocols'
 import { LinkStudentController } from './link-student.controller'
 
@@ -144,5 +144,12 @@ describe('Link Student Controller', () => {
 
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(notFound())
+  })
+
+  test('Should return 200 if valid credentials are provided', async () => {
+    const { sut } = makeSut()
+
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(ok({ success: true }))
   })
 })
