@@ -2,21 +2,33 @@ import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 import { IntValidator } from '../../protocols/id-validator'
+import { RegisterCodeValidator } from '../../protocols/register-code-validator'
 
 export class LinkStudentController implements Controller {
-  constructor (private readonly intValidator: IntValidator) {
+  constructor (private readonly intValidator: IntValidator,
+    private readonly registerCodeValidator: RegisterCodeValidator) {
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const { id } = httpRequest.body
+      const { id, registerCode } = httpRequest.body
       if (!id) {
         return badRequest(new MissingParamError('id'))
       }
 
-      const isValid = this.intValidator.isValid(id)
-      if (!isValid) {
+      if (!registerCode) {
+        return badRequest(new MissingParamError('registerCode'))
+      }
+
+      const isIdValid = this.intValidator.isValid(id)
+      if (!isIdValid) {
         return badRequest(new InvalidParamError('id'))
+      }
+
+      const isRegisterCodeValid = this.registerCodeValidator.isValid(registerCode)
+
+      if (!isRegisterCodeValid) {
+        return badRequest(new InvalidParamError('registerCode'))
       }
 
       return ok({})
