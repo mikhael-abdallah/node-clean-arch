@@ -1,9 +1,6 @@
-import { LinkStudentPerson } from '../../../domain/usecases/link-student-person'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
-import { Controller, HttpRequest, HttpResponse } from '../../protocols'
-import { IntValidator } from '../../protocols/id-validator'
-import { RegisterCodeValidator } from '../../protocols/register-code-validator'
+import { LinkStudentPerson, Controller, HttpRequest, HttpResponse, IntValidator, RegisterCodeValidator } from './link-student-protocols'
 
 export class LinkStudentController implements Controller {
   constructor (private readonly intValidator: IntValidator,

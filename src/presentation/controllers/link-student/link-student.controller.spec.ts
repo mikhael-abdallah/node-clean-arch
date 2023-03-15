@@ -1,10 +1,7 @@
-import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, notFound, serverError } from '../../helpers/http-helper'
-import { HttpRequest } from '../../protocols'
-import { IntValidator } from '../../protocols/id-validator'
-import { RegisterCodeValidator } from '../../protocols/register-code-validator'
+import { MissingParamError, InvalidParamError } from '../../errors'
+import { badRequest, serverError, notFound } from '../../helpers/http-helper'
+import { IntValidator, LinkStudentPerson, RegisterCodeValidator, HttpRequest } from './link-student-protocols'
 import { LinkStudentController } from './link-student.controller'
-import { LinkStudentPerson } from '../../../domain/usecases/link-student-person'
 
 const makeIntValidator = (): IntValidator => {
   class IntValidatorStub implements IntValidator {
