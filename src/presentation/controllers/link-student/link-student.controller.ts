@@ -1,6 +1,6 @@
 import { LinkStudentPerson } from '../../../domain/usecases/link-student-person'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, ok, serverError } from '../../helpers/http-helper'
+import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 import { IntValidator } from '../../protocols/id-validator'
 import { RegisterCodeValidator } from '../../protocols/register-code-validator'
@@ -34,7 +34,11 @@ export class LinkStudentController implements Controller {
         return badRequest(new InvalidParamError('registerCode'))
       }
 
-      await this.linkStudentPerson.link(id, registerCode)
+      const hasLinked = await this.linkStudentPerson.link(id, registerCode)
+
+      if (!hasLinked) {
+        return notFound()
+      }
 
       return ok({})
     } catch (error: unknown) {
