@@ -8,11 +8,12 @@ export class LinkStudentController implements Controller {
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    if (!httpRequest?.body?.id) {
+    const { id } = httpRequest.body
+    if (!id) {
       return badRequest(new MissingParamError('id'))
     }
 
-    const isValid = this.intValidator.isValid(httpRequest.body.id)
+    const isValid = this.intValidator.isValid(id)
     if (!isValid) {
       return badRequest(new InvalidParamError('id'))
     }

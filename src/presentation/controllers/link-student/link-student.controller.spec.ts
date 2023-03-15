@@ -1,5 +1,6 @@
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest } from '../../helpers/http-helper'
+import { HttpRequest } from '../../protocols'
 import { IntValidator } from '../../protocols/id-validator'
 import { LinkStudentController } from './link-student.controller'
 
@@ -12,6 +13,13 @@ const makeIntValidator = (): IntValidator => {
 
   return new IntValidatorStub()
 }
+
+const makeFakeRequest = (): HttpRequest => (
+  {
+    body: {
+      id: 3
+    }
+  })
 
 interface SutTypes {
   sut: LinkStudentController
@@ -29,6 +37,7 @@ describe('Link Student Controller', () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
+        // id: 3
       }
     }
     const httpResponse = await sut.handle(httpRequest)
@@ -38,24 +47,14 @@ describe('Link Student Controller', () => {
   test('Should return 400 if an invalid int id is provided', async () => {
     const { sut, intValidatorStub } = makeSut()
     jest.spyOn(intValidatorStub, 'isValid').mockReturnValueOnce(false)
-    const httpRequest = {
-      body: {
-        id: 3
-      }
-    }
-    const httpResponse = await sut.handle(httpRequest)
+    const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new InvalidParamError('id')))
   })
 
   test('Should call IntValidator with correct id', async () => {
     const { sut, intValidatorStub } = makeSut()
     const isValidSpy = jest.spyOn(intValidatorStub, 'isValid')
-    const httpRequest = {
-      body: {
-        id: 3
-      }
-    }
-    await sut.handle(httpRequest)
+    await sut.handle(makeFakeRequest())
     expect(isValidSpy).toHaveBeenCalledWith(3)
   })
 })
