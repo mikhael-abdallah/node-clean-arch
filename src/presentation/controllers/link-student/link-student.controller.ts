@@ -1,9 +1,13 @@
 import { MissingParamError } from '../../errors'
-import { badRequest } from '../../helpers/http-helper'
+import { badRequest, ok } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 
 export class LinkStudentController implements Controller {
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    return badRequest(new MissingParamError('id'))
+    if (!httpRequest?.body?.id) {
+      return badRequest(new MissingParamError('id'))
+    }
+
+    return ok({})
   }
 }
