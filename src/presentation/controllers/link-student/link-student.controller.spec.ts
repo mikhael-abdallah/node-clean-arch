@@ -1,4 +1,4 @@
-import { MissingParamError, InvalidParamError } from '../../errors'
+import { MissingParamError, InvalidParamError, ServerError } from '../../errors'
 import { badRequest, serverError, notFound } from '../../helpers/http-helper'
 import { IntValidator, LinkStudentPerson, RegisterCodeValidator, HttpRequest } from './link-student-protocols'
 import { LinkStudentController } from './link-student.controller'
@@ -118,6 +118,17 @@ describe('Link Student Controller', () => {
 
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError())
+  })
+
+  test('Should return 500 if LinkStudentPerson throws', async () => {
+    const { linkStudentPersonStub, sut } = makeSut()
+
+    jest.spyOn(linkStudentPersonStub, 'link').mockImplementationOnce(() => {
+      throw new Error()
+    })
+
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(serverError(new ServerError()))
   })
 
   test('Should call Linker with correct value', async () => {
