@@ -4,6 +4,7 @@ import { HttpRequest } from '../../protocols'
 import { IntValidator } from '../../protocols/id-validator'
 import { RegisterCodeValidator } from '../../protocols/register-code-validator'
 import { LinkStudentController } from './link-student.controller'
+import { LinkStudentPerson } from '../../../domain/usecases/link-student-person'
 
 const makeIntValidator = (): IntValidator => {
   class IntValidatorStub implements IntValidator {
@@ -13,6 +14,16 @@ const makeIntValidator = (): IntValidator => {
   }
 
   return new IntValidatorStub()
+}
+
+const makeLinkStudentPerson = (): LinkStudentPerson => {
+  class LinkStudentPersonStub implements LinkStudentPerson {
+    async link (id: number, registerCode: string): Promise<boolean> {
+      return true
+    }
+  }
+
+  return new LinkStudentPersonStub()
 }
 
 const makeRegisterCodeValidator = (): RegisterCodeValidator => {
@@ -36,14 +47,17 @@ const makeFakeRequest = (): HttpRequest => (
 interface SutTypes {
   sut: LinkStudentController
   intValidatorStub: IntValidator
-  registerCodeValidator: RegisterCodeValidator
+  registerCodeValidatorStub: RegisterCodeValidator
+  linkStudentPersonStub: LinkStudentPerson
 }
 
 const makeSut = (): SutTypes => {
   const intValidatorStub = makeIntValidator()
-  const registerCodeValidator = makeRegisterCodeValidator()
-  const sut = new LinkStudentController(intValidatorStub, registerCodeValidator)
-  return { sut, intValidatorStub, registerCodeValidator }
+  const registerCodeValidatorStub = makeRegisterCodeValidator()
+  const linkStudentPersonStub = makeLinkStudentPerson()
+  const sut = new LinkStudentController(intValidatorStub, registerCodeValidatorStub, linkStudentPersonStub)
+
+  return { sut, intValidatorStub, registerCodeValidatorStub, linkStudentPersonStub }
 }
 
 describe('Link Student Controller', () => {
@@ -79,15 +93,15 @@ describe('Link Student Controller', () => {
   })
 
   test('Should return 400 if an invalid regiter code is provided', async () => {
-    const { sut, registerCodeValidator } = makeSut()
-    jest.spyOn(registerCodeValidator, 'isValid').mockReturnValueOnce(false)
+    const { sut, registerCodeValidatorStub } = makeSut()
+    jest.spyOn(registerCodeValidatorStub, 'isValid').mockReturnValueOnce(false)
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new InvalidParamError('registerCode')))
   })
 
   test('Should call RegisterCodeValidator with correct value', async () => {
-    const { sut, registerCodeValidator } = makeSut()
-    const isValidSpy = jest.spyOn(registerCodeValidator, 'isValid')
+    const { sut, registerCodeValidatorStub } = makeSut()
+    const isValidSpy = jest.spyOn(registerCodeValidatorStub, 'isValid')
     await sut.handle(makeFakeRequest())
     expect(isValidSpy).toHaveBeenCalledWith('0123456789')
   })
@@ -109,10 +123,10 @@ describe('Link Student Controller', () => {
     expect(httpResponse).toEqual(serverError())
   })
 
-  test('Should call RegisterCodeValidator with correct value', async () => {
-    const { sut, registerCodeValidator } = makeSut()
-    const isValidSpy = jest.spyOn(registerCodeValidator, 'isValid')
+  test('Should call Linker with correct value', async () => {
+    const { sut, linkStudentPersonStub } = makeSut()
+    const linkSpy = jest.spyOn(linkStudentPersonStub, 'link')
     await sut.handle(makeFakeRequest())
-    expect(isValidSpy).toHaveBeenCalledWith('0123456789')
+    expect(linkSpy).toHaveBeenCalledWith(3, '0123456789')
   })
 })
