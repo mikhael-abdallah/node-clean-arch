@@ -7,8 +7,8 @@ export class IsDateValidation implements Validation {
   validate (input: any): Error | undefined {
     const value = input?.[this.fieldName]
     if (!value) return undefined
-    const isValidDate = !Number.isNaN(Date.parse(value))
-    if (!isValidDate) {
+    const isValid = !Number.isNaN(Date.parse(value))
+    if (!isValid) {
       return new InvalidParamError(this.fieldName)
     }
   }
