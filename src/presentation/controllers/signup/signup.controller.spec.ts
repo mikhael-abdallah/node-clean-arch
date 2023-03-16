@@ -1,6 +1,6 @@
 import { SignUpController } from './signup.controller'
 import { MissingParamError, InvalidParamError, ServerError } from '../../errors'
-import { HttpRequest, AddPerson, AddPersonModel, EmailValidator, PersonModel } from './signup-protocols'
+import { HttpRequest, AddPerson, AddPersonModel, EmailValidator, PersonModel, Validation } from './signup-protocols'
 import * as SignUpProtocols from './signup-protocols'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
 
@@ -22,6 +22,15 @@ const makeAddPerson = (): AddPerson => {
   return new AddPersonStub()
 }
 
+const makeValidation = (): Validation => {
+  class ValidationStub implements Validation {
+    validate (input: any): Error | null {
+      return null
+    }
+  }
+  return new ValidationStub()
+}
+
 const makeFakePerson = (): PersonModel => ({
   id: 1,
   name: 'valid_name',
@@ -41,15 +50,17 @@ interface SutTypes {
   sut: SignUpController
   emailValidatorStub: EmailValidator
   addPersonStub: AddPerson
+  validationStub: Validation
 }
 
 const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidator()
   const addPersonStub = makeAddPerson()
-  const sut = new SignUpController(emailValidatorStub, addPersonStub)
+  const validationStub = makeValidation()
+  const sut = new SignUpController(emailValidatorStub, addPersonStub, validationStub)
 
   return {
-    sut, emailValidatorStub, addPersonStub
+    sut, emailValidatorStub, addPersonStub, validationStub
   }
 }
 
@@ -149,6 +160,14 @@ describe('SignUp Controller', () => {
       email: 'any_email@mail.com',
       birthDate: '2000-01-01'
     })
+  })
+
+  test('Should call validation with correct value', async () => {
+    const { sut, validationStub } = makeSut() // system under test
+    const validateSpy = jest.spyOn(validationStub, 'validate')
+    await sut.handle(makeFakeRequest())
+    const httpRequest = makeFakeRequest()
+    expect(validateSpy).toHaveBeenCalledWith(httpRequest?.body)
   })
 
   test('Should return 200 if valid data is provided', async () => {
