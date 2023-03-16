@@ -69,35 +69,6 @@ describe('SignUp Controller', () => {
     expect(typeof SignUpProtocols).toBe('object')
   })
 
-  test('Should return 400 if no name is provided', async () => {
-    const { sut } = makeSut() // system under test
-    const httpRequest = {
-      body: {
-        // name: "Nome da pesssoa",
-        email: 'usuario@mail.com',
-        birthDate: '2000-01-01'
-      }
-
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse).toEqual(badRequest(new MissingParamError('name')))
-  })
-
-  test('Should return 400 if no email is provided', async () => {
-    const { sut } = makeSut() // system under test
-    const httpRequest = {
-      body: {
-        name: 'Nome da pesssoa',
-        // email: 'usuario@mail.com',
-        birthDate: '2000-01-01'
-      }
-
-    }
-    const httpResponse = await sut.handle(httpRequest)
-
-    expect(httpResponse).toEqual(badRequest(new MissingParamError('email')))
-  })
-
   test('Should return 400 if an invalid email is provided', async () => {
     const { sut, emailValidatorStub } = makeSut() // system under test
     jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
