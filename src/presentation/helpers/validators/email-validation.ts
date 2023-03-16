@@ -9,7 +9,6 @@ export class EmailValidation implements Validation {
   validate (input: any): Error | undefined {
     const value = input?.[this.fieldName]
     const isValid = typeof value === 'string' && this.emailValidator.isValid(value)
-    console.log('is not throwing')
 
     if (!isValid) {
       return new InvalidParamError(this.fieldName)

@@ -21,11 +21,11 @@ model bin_discipline {
 model bin_person {
   id                Int       @id(map: "PK__bin_pers__3213E83FD7A9DCF4")
   name              String    @db.VarChar(200)
-  birth_date        DateTime @db.Date
+  birth_date        DateTime? @db.Date
   creation_date     DateTime  @db.Date
   change_date       DateTime  @default(now(), map: "DF__bin_perso__chang__1EA48E88") @updatedAt @db.Date
   deactivation_date DateTime  @default(now(), map: "DF__bin_perso__deact__1F98B2C1") @db.Date
-  email             String   @db.VarChar(200)
+  email             String  @db.VarChar(200)
 }
 
 model bin_school_class {
@@ -74,7 +74,7 @@ model discipline {
 model person {
   id            Int       @id(map: "PK__person__3213E83F1AEE5BD7") @default(autoincrement())
   name          String    @db.VarChar(200)
-  birth_date    DateTime @db.Date
+  birth_date    DateTime? @db.Date
   creation_date DateTime  @default(now(), map: "DF__person__creation__68487DD7") @db.Date
   change_date   DateTime  @default(now(), map: "DF__person__change_d__693CA210") @updatedAt @db.Date
   email         String   @db.VarChar(200)
@@ -118,7 +118,7 @@ model teacher {
 }
 
 model log_error {
-  message       String?  @db.VarChar(1000)
+  message       String?  @db.VarChar(Max)
   creation_date DateTime @default(now(), map: "DF__log_error__creat__3B40CD36") @db.Date
   id            Int      @id(map: "PK__log_erro__3213E83FB8C63386") @default(autoincrement())
 }
