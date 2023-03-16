@@ -77,21 +77,6 @@ describe('SignUp Controller', () => {
     expect(httpResponse).toEqual(badRequest(new InvalidParamError('email')))
   })
 
-  test('Should return 400 if an birthDate confirmation fails', async () => {
-    const { sut } = makeSut() // system under test
-    const httpRequest = {
-      body: {
-        name: 'Nome da pesssoa',
-        email: 'invalid_email@mail.com',
-        birthDate: 'asdlfkj'
-      }
-
-    }
-    const httpResponse = await sut.handle(httpRequest)
-
-    expect(httpResponse).toEqual(badRequest(new InvalidParamError('birthDate')))
-  })
-
   test('Should call EmailValidator with correct email', async () => {
     const { sut, emailValidatorStub } = makeSut() // system under test
     const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')

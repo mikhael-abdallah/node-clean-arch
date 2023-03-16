@@ -17,14 +17,6 @@ export class SignUpController implements Controller {
 
       const { name, birthDate, email } = httpRequest.body
 
-      if (birthDate) {
-        const date = birthDate
-        const isValidDate = !Number.isNaN(Date.parse(date))
-        if (!isValidDate) {
-          return badRequest(new InvalidParamError('birthDate'))
-        }
-      }
-
       const isValid = this.emailValidator.isValid(email)
 
       if (!isValid) {
