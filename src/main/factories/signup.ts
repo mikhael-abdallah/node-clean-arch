@@ -8,6 +8,7 @@ import { SignUpController } from '../../presentation/controllers/signup/signup.c
 import { Controller } from '../../presentation/protocols'
 import { EmailValidatorAdapter } from '../../utils/email-validator-adapter'
 import { LogControllerDecorator } from '../decorators/log'
+import { makeSignUpValidation } from './signup-validation'
 
 export const makeSignUpController = (): Controller => {
   const emailValidatorAdapter = new EmailValidatorAdapter()
@@ -16,6 +17,6 @@ export const makeSignUpController = (): Controller => {
   const personPrismaRepository = new PersonPrismaRepository(prismaHelper)
   const logPrismaRepository = new LogPrismaRepository(prismaHelper)
   const dbAddPerson = new DbAddPerson(personPrismaRepository)
-  const signUpController = new SignUpController(emailValidatorAdapter, dbAddPerson)
+  const signUpController = new SignUpController(emailValidatorAdapter, dbAddPerson, makeSignUpValidation())
   return new LogControllerDecorator(signUpController, logPrismaRepository)
 }
