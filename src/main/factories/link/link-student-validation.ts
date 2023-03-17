@@ -1,6 +1,5 @@
-import { RequiredFieldValidation } from '../../../presentation/helpers/validators/required-field-validation'
+import { ValidationComposite, RequiredFieldValidation } from '../../../presentation/helpers/validators'
 import { Validation } from '../../../presentation/protocols/validation'
-import { ValidationComposite } from '../../../presentation/helpers/validators/validation-composite'
 
 export const makeLinkStudentValidation = (): ValidationComposite => {
   const validations: Validation[] = []
