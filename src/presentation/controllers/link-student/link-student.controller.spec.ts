@@ -1,5 +1,5 @@
 import { MissingParamError, ServerError } from '../../errors'
-import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
+import { badRequest, notFound, ok, serverError } from '../../helpers/http/http-helper'
 import { Validation } from '../signup/signup-protocols'
 import { LinkStudentPerson, HttpRequest } from './link-student-protocols'
 import { LinkStudentController } from './link-student.controller'
