@@ -1,4 +1,4 @@
-import { AddPersonRepository } from '../../../../data/protocols/add-person-repository'
+import { AddPersonRepository } from '../../../../data/protocols/db/add-person-repository'
 import { PersonModel } from '../../../../domain/models/person'
 import { AddPersonModel } from '../../../../domain/usecases/add-person'
 import { MongoHelper } from '../helpers/mongo-helper'

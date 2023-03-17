@@ -1,5 +1,5 @@
 import { LinkStudentPersonModel } from '../../../domain/usecases/link-student-person'
-import { LoadPersonByIdRepository } from '../../protocols/load-person-by-id-repository'
+import { LoadPersonByIdRepository } from '../../protocols/db/load-person-by-id-repository'
 import { PersonModel } from '../add-person/db-add-person-protocols'
 import { DbLinkStudentPerson } from './db-link-student-person'
 
