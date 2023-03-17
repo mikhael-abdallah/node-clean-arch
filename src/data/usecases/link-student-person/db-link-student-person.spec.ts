@@ -42,6 +42,14 @@ describe('DbLinkStudentPerson Usecase', () => {
     expect(linkSpy).toHaveBeenCalledWith(3)
   })
 
+  test('Should return null false LoadPersonByIdRepository returns false', async () => {
+    const { loadPersonByIdRepositoryStub, sut } = makeSut()
+    jest.spyOn(loadPersonByIdRepositoryStub, 'load').mockReturnValueOnce(new Promise(resolve => { resolve(null) }))
+    const hasLinked = await sut.link(makeLinkStudentPerson())
+
+    expect(hasLinked).toBe(false)
+  })
+
   test('Should throw if  LoadPersonByIdRepository throws error', async () => {
     const { loadPersonByIdRepositoryStub, sut } = makeSut()
     jest.spyOn(loadPersonByIdRepositoryStub, 'load')
