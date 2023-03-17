@@ -1,16 +1,16 @@
-import { MissingParamError, InvalidParamError, ServerError } from '../../errors'
-import { badRequest, serverError, notFound, ok } from '../../helpers/http-helper'
-import { IntValidator, LinkStudentPerson, RegisterCodeValidator, HttpRequest } from './link-student-protocols'
+import { MissingParamError } from '../../errors'
+import { badRequest, notFound, ok } from '../../helpers/http-helper'
+import { Validation } from '../signup/signup-protocols'
+import { LinkStudentPerson, HttpRequest } from './link-student-protocols'
 import { LinkStudentController } from './link-student.controller'
 
-const makeIntValidator = (): IntValidator => {
-  class IntValidatorStub implements IntValidator {
-    isValid (id: number): boolean {
-      return true
+const makeValidation = (): Validation => {
+  class ValidationStub implements Validation {
+    validate (input: any): Error | undefined {
+      return undefined
     }
   }
-
-  return new IntValidatorStub()
+  return new ValidationStub()
 }
 
 const makeLinkStudentPerson = (): LinkStudentPerson => {
@@ -23,16 +23,6 @@ const makeLinkStudentPerson = (): LinkStudentPerson => {
   return new LinkStudentPersonStub()
 }
 
-const makeRegisterCodeValidator = (): RegisterCodeValidator => {
-  class RegisterCodeValidatorStub implements RegisterCodeValidator {
-    isValid (registerCode: string): boolean {
-      return true
-    }
-  }
-
-  return new RegisterCodeValidatorStub()
-}
-
 const makeFakeRequest = (): HttpRequest => (
   {
     body: {
@@ -43,94 +33,19 @@ const makeFakeRequest = (): HttpRequest => (
 
 interface SutTypes {
   sut: LinkStudentController
-  intValidatorStub: IntValidator
-  registerCodeValidatorStub: RegisterCodeValidator
   linkStudentPersonStub: LinkStudentPerson
+  validationStub: Validation
 }
 
 const makeSut = (): SutTypes => {
-  const intValidatorStub = makeIntValidator()
-  const registerCodeValidatorStub = makeRegisterCodeValidator()
   const linkStudentPersonStub = makeLinkStudentPerson()
-  const sut = new LinkStudentController(intValidatorStub, registerCodeValidatorStub, linkStudentPersonStub)
+  const validationStub = makeValidation()
+  const sut = new LinkStudentController(linkStudentPersonStub, validationStub)
 
-  return { sut, intValidatorStub, registerCodeValidatorStub, linkStudentPersonStub }
+  return { sut, linkStudentPersonStub, validationStub }
 }
 
 describe('Link Student Controller', () => {
-  test('Should return 400 if no personId is provided', async () => {
-    const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        // id: 3
-        registerCode: '0123456789'
-      }
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse).toEqual(badRequest(new MissingParamError('id')))
-  })
-
-  test('Should return 400 if no registerCode is provided', async () => {
-    const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        id: 3
-        // registerCode: '0003485829'
-      }
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse).toEqual(badRequest(new MissingParamError('registerCode')))
-  })
-
-  test('Should return 400 if an invalid int id is provided', async () => {
-    const { sut, intValidatorStub } = makeSut()
-    jest.spyOn(intValidatorStub, 'isValid').mockReturnValueOnce(false)
-    const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(badRequest(new InvalidParamError('id')))
-  })
-
-  test('Should return 400 if an invalid regiter code is provided', async () => {
-    const { sut, registerCodeValidatorStub } = makeSut()
-    jest.spyOn(registerCodeValidatorStub, 'isValid').mockReturnValueOnce(false)
-    const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(badRequest(new InvalidParamError('registerCode')))
-  })
-
-  test('Should call RegisterCodeValidator with correct value', async () => {
-    const { sut, registerCodeValidatorStub } = makeSut()
-    const isValidSpy = jest.spyOn(registerCodeValidatorStub, 'isValid')
-    await sut.handle(makeFakeRequest())
-    expect(isValidSpy).toHaveBeenCalledWith('0123456789')
-  })
-
-  test('Should call IntValidator with correct id', async () => {
-    const { sut, intValidatorStub } = makeSut()
-    const isValidSpy = jest.spyOn(intValidatorStub, 'isValid')
-    await sut.handle(makeFakeRequest())
-    expect(isValidSpy).toHaveBeenCalledWith(3)
-  })
-
-  test('Should return 500 if IntValidator throws', async () => {
-    const { sut, intValidatorStub } = makeSut()
-    jest.spyOn(intValidatorStub, 'isValid').mockImplementationOnce(() => {
-      throw new Error()
-    })
-
-    const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(serverError())
-  })
-
-  test('Should return 500 if LinkStudentPerson throws', async () => {
-    const { linkStudentPersonStub, sut } = makeSut()
-
-    jest.spyOn(linkStudentPersonStub, 'link').mockImplementationOnce(() => {
-      throw new Error()
-    })
-
-    const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(serverError(new ServerError()))
-  })
-
   test('Should call Linker with correct value', async () => {
     const { sut, linkStudentPersonStub } = makeSut()
     const linkSpy = jest.spyOn(linkStudentPersonStub, 'link')
@@ -144,6 +59,21 @@ describe('Link Student Controller', () => {
 
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(notFound())
+  })
+
+  test('Should call validation with correct value', async () => {
+    const { sut, validationStub } = makeSut() // system under test
+    const validateSpy = jest.spyOn(validationStub, 'validate')
+    await sut.handle(makeFakeRequest())
+    const httpRequest = makeFakeRequest()
+    expect(validateSpy).toHaveBeenCalledWith(httpRequest?.body)
+  })
+
+  test('Should return 400 if Validation returns an error', async () => {
+    const { sut, validationStub } = makeSut() // system under test
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new MissingParamError('any_field'))
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new MissingParamError('any_field')))
   })
 
   test('Should return 200 if valid credentials are provided', async () => {

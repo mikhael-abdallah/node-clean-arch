@@ -89,13 +89,6 @@ describe('SignUp Controller', () => {
     expect(validateSpy).toHaveBeenCalledWith(httpRequest?.body)
   })
 
-  test('Should return 200 if valid data is provided', async () => {
-    const { sut } = makeSut() // system under test
-    const httpResponse = await sut.handle(makeFakeRequest())
-
-    expect(httpResponse).toEqual(ok(makeFakePerson()))
-  })
-
   test('Should return 400 if Validation returns an error', async () => {
     const { sut, validationStub } = makeSut() // system under test
     jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new MissingParamError('any_field'))
@@ -103,5 +96,12 @@ describe('SignUp Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
 
     expect(httpResponse).toEqual(badRequest(new MissingParamError('any_field')))
+  })
+
+  test('Should return 200 if valid data is provided', async () => {
+    const { sut } = makeSut() // system under test
+    const httpResponse = await sut.handle(makeFakeRequest())
+
+    expect(httpResponse).toEqual(ok(makeFakePerson()))
   })
 })
