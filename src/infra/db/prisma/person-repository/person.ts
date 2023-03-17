@@ -8,16 +8,17 @@ export class PersonPrismaRepository {
   async add (personData: AddPersonModel): Promise<PersonModel> {
     const client = await this.prismaHelper.getClient()
     const { birthDate, ...restPersonData } = personData
+
     const person = await client.person.create({
       data: {
         ...restPersonData,
-        birth_date: new Date(birthDate)
+        birth_date: new Date(birthDate) || undefined
       }
     })
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { birth_date, ...restPerson } = person
     return {
-      birthDate: birth_date.toISOString().split('T')[0],
+      birthDate: birth_date?.toISOString()?.split('T')?.[0],
       ...restPerson
     }
   }
