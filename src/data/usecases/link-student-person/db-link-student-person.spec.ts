@@ -1,6 +1,5 @@
 import { LinkStudentPersonModel } from '../../../domain/usecases/link-student-person'
-import { LoadPersonByIdRepository } from '../../protocols/db/load-person-by-id-repository'
-import { PersonModel } from '../add-person/db-add-person-protocols'
+import { LinkStudentPersonRepository } from '../../protocols/db/link-student-person-repository'
 import { DbLinkStudentPerson } from './db-link-student-person'
 
 const makeLinkStudentPerson = (): LinkStudentPersonModel => ({
@@ -8,51 +7,45 @@ const makeLinkStudentPerson = (): LinkStudentPersonModel => ({
   registerCode: '0123456789'
 })
 
-const makeFakePerson = (): PersonModel => ({
-  id: 1,
-  name: 'valid_name',
-  email: 'valid_email'
-})
-
-const makeLoadPersonByIdRepository = (): LoadPersonByIdRepository => {
-  class LoadPersonByIdRepositoryStub implements LoadPersonByIdRepository {
-    async load (id: number): Promise<PersonModel> {
-      return new Promise(resolve => { resolve(makeFakePerson()) })
+const makeLinkStudentPersonRepository = (): LinkStudentPersonRepository => {
+  class LinkStudentPersonRepositoryStub implements LinkStudentPersonRepository {
+    async link (id: number): Promise<boolean> {
+      return new Promise(resolve => { resolve(true) })
     }
   }
-  return new LoadPersonByIdRepositoryStub()
+  return new LinkStudentPersonRepositoryStub()
 }
 interface SutTypes {
   sut: DbLinkStudentPerson
-  loadPersonByIdRepositoryStub: LoadPersonByIdRepository
+  linkStudentPersonRepositoryStub: LinkStudentPersonRepository
 }
 
 const makeSut = (): SutTypes => {
-  const loadPersonByIdRepositoryStub = makeLoadPersonByIdRepository()
-  const sut = new DbLinkStudentPerson(loadPersonByIdRepositoryStub)
-  return { sut, loadPersonByIdRepositoryStub }
+  const linkStudentPersonRepositoryStub = makeLinkStudentPersonRepository()
+  const sut = new DbLinkStudentPerson(linkStudentPersonRepositoryStub)
+  return { sut, linkStudentPersonRepositoryStub }
 }
 
 describe('DbLinkStudentPerson Usecase', () => {
-  test('Should call LoadPersonByIdRepository with correct id', async () => {
-    const { loadPersonByIdRepositoryStub, sut } = makeSut()
-    const linkSpy = jest.spyOn(loadPersonByIdRepositoryStub, 'load')
+  test('Should call LinkStudentPersonRepository with correct id', async () => {
+    const { linkStudentPersonRepositoryStub, sut } = makeSut()
+    const linkSpy = jest.spyOn(linkStudentPersonRepositoryStub, 'link')
     await sut.link(makeLinkStudentPerson())
 
     expect(linkSpy).toHaveBeenCalledWith(3)
   })
 
-  test('Should return null false LoadPersonByIdRepository returns false', async () => {
-    const { loadPersonByIdRepositoryStub, sut } = makeSut()
-    jest.spyOn(loadPersonByIdRepositoryStub, 'load').mockReturnValueOnce(new Promise(resolve => { resolve(null) }))
+  test('Should return false if LinkStudentPersonRepository returns false', async () => {
+    const { linkStudentPersonRepositoryStub, sut } = makeSut()
+    jest.spyOn(linkStudentPersonRepositoryStub, 'link').mockReturnValueOnce(new Promise(resolve => { resolve(false) }))
     const hasLinked = await sut.link(makeLinkStudentPerson())
 
     expect(hasLinked).toBe(false)
   })
 
-  test('Should throw if  LoadPersonByIdRepository throws error', async () => {
-    const { loadPersonByIdRepositoryStub, sut } = makeSut()
-    jest.spyOn(loadPersonByIdRepositoryStub, 'load')
+  test('Should throw if LinkStudentPersonRepository throws error', async () => {
+    const { linkStudentPersonRepositoryStub, sut } = makeSut()
+    jest.spyOn(linkStudentPersonRepositoryStub, 'link')
       .mockReturnValueOnce(new Promise((resolve, reject) => { reject(new Error()) }))
 
     const promise = sut.link(makeLinkStudentPerson())
