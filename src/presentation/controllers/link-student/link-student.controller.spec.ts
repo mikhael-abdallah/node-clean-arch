@@ -1,5 +1,5 @@
-import { MissingParamError } from '../../errors'
-import { badRequest, notFound, ok } from '../../helpers/http-helper'
+import { MissingParamError, ServerError } from '../../errors'
+import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
 import { Validation } from '../signup/signup-protocols'
 import { LinkStudentPerson, HttpRequest } from './link-student-protocols'
 import { LinkStudentController } from './link-student.controller'
@@ -74,6 +74,18 @@ describe('Link Student Controller', () => {
     jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new MissingParamError('any_field'))
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new MissingParamError('any_field')))
+  })
+
+  test('Should return 500 if LinkStudent throws', async () => {
+    const { linkStudentPersonStub, sut } = makeSut()
+
+    jest.spyOn(linkStudentPersonStub, 'link').mockImplementationOnce(async () => {
+      return new Promise((resolve, reject) => { reject(new Error()) })
+    })
+
+    const httpResponse = await sut.handle(makeFakeRequest())
+
+    expect(httpResponse).toEqual(serverError(new ServerError()))
   })
 
   test('Should return 200 if valid credentials are provided', async () => {
