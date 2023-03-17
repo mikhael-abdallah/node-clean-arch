@@ -3,6 +3,7 @@ import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper
 import { Validation } from '../signup/signup-protocols'
 import { LinkStudentPerson, HttpRequest } from './link-student-protocols'
 import { LinkStudentController } from './link-student.controller'
+import * as LinkStudentProtocols from './link-student-protocols'
 
 const makeValidation = (): Validation => {
   class ValidationStub implements Validation {
@@ -51,6 +52,10 @@ describe('Link Student Controller', () => {
     const linkSpy = jest.spyOn(linkStudentPersonStub, 'link')
     await sut.handle(makeFakeRequest())
     expect(linkSpy).toHaveBeenCalledWith(3, '0123456789')
+  })
+
+  test('Should import linkStudent protocols', () => {
+    expect(typeof LinkStudentProtocols).toBe('object')
   })
 
   test('Should return 404 if id not found', async () => {
