@@ -5,8 +5,6 @@ export class DbLinkStudentPerson implements LinkStudentPerson {
   constructor (private readonly linkPersonStudentRepository: LinkStudentPersonRepository) {}
   async link (linkStudentPerson: LinkStudentPersonModel): Promise<boolean> {
     const { id } = linkStudentPerson
-    const isLinked = await this.linkPersonStudentRepository.link(id)
-    if (!isLinked) return false
-    return true
+    return await this.linkPersonStudentRepository.link(id)
   }
 }
