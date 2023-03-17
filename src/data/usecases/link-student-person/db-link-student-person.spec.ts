@@ -8,21 +8,34 @@ const makeLinkStudentPerson = (): LinkStudentPersonModel => ({
   registerCode: '0123456789'
 })
 
+const makeFakePerson = (): PersonModel => ({
+  id: 1,
+  name: 'valid_name',
+  email: 'valid_email'
+})
+
+const makeLoadPersonByIdRepository = (): LoadPersonByIdRepository => {
+  class LoadPersonByIdRepositoryStub implements LoadPersonByIdRepository {
+    async load (id: number): Promise<PersonModel> {
+      return new Promise(resolve => { resolve(makeFakePerson()) })
+    }
+  }
+  return new LoadPersonByIdRepositoryStub()
+}
+interface SutTypes {
+  sut: DbLinkStudentPerson
+  loadPersonByIdRepositoryStub: LoadPersonByIdRepository
+}
+
+const makeSut = (): SutTypes => {
+  const loadPersonByIdRepositoryStub = makeLoadPersonByIdRepository()
+  const sut = new DbLinkStudentPerson(loadPersonByIdRepositoryStub)
+  return { sut, loadPersonByIdRepositoryStub }
+}
+
 describe('DbLinkStudentPerson Usecase', () => {
   test('Should call LoadPersonByIdRepository with correct id', async () => {
-    class LoadPersonByIdRepositoryStub implements LoadPersonByIdRepository {
-      async load (id: number): Promise<PersonModel> {
-        const person: PersonModel = {
-          id: 3,
-          name: 'any_name',
-          email: 'any@email.com'
-        }
-        return new Promise(resolve => { resolve(person) })
-      }
-    }
-
-    const loadPersonByIdRepositoryStub = new LoadPersonByIdRepositoryStub()
-    const sut = new DbLinkStudentPerson(loadPersonByIdRepositoryStub)
+    const { loadPersonByIdRepositoryStub, sut } = makeSut()
     const linkSpy = jest.spyOn(loadPersonByIdRepositoryStub, 'load')
     await sut.link(makeLinkStudentPerson())
 
