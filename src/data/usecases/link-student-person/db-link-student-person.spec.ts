@@ -52,4 +52,10 @@ describe('DbLinkStudentPerson Usecase', () => {
 
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return true when success', async () => {
+    const { sut } = makeSut()
+    const hasLinked = await sut.link(makeLinkStudentPerson())
+    expect(hasLinked).toEqual(true)
+  })
 })
