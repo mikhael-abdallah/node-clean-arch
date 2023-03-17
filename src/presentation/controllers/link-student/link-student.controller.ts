@@ -15,7 +15,7 @@ export class LinkStudentController implements Controller {
       }
       const { id, registerCode } = httpRequest.body
 
-      const hasLinked = await this.linkStudentPerson.link(id, registerCode)
+      const hasLinked = await this.linkStudentPerson.link({ id, registerCode })
 
       if (!hasLinked) {
         return notFound()

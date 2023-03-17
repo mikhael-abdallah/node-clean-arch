@@ -1,3 +1,8 @@
+export interface LinkStudentPersonModel {
+  id: number
+  registerCode: string
+}
+
 export interface LinkStudentPerson {
-  link: (id: number, registerCode: string) => Promise<boolean>
+  link: (linkStudentPerson: LinkStudentPersonModel) => Promise<boolean>
 }

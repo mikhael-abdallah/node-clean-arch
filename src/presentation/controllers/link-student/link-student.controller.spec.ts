@@ -1,9 +1,7 @@
 import { MissingParamError, ServerError } from '../../errors'
-import { badRequest, notFound, ok, serverError } from '../../helpers/http/http-helper'
-import { Validation } from '../signup/signup-protocols'
-import { LinkStudentPerson, HttpRequest } from './link-student-protocols'
+import { notFound, badRequest, serverError, ok } from '../../helpers/http/http-helper'
+import { HttpRequest, LinkStudentPerson, LinkStudentPersonModel, Validation } from './link-student-protocols'
 import { LinkStudentController } from './link-student.controller'
-import * as LinkStudentProtocols from './link-student-protocols'
 
 const makeValidation = (): Validation => {
   class ValidationStub implements Validation {
@@ -16,7 +14,7 @@ const makeValidation = (): Validation => {
 
 const makeLinkStudentPerson = (): LinkStudentPerson => {
   class LinkStudentPersonStub implements LinkStudentPerson {
-    async link (id: number, registerCode: string): Promise<boolean> {
+    async link (linkStudentPerson: LinkStudentPersonModel): Promise<boolean> {
       return true
     }
   }
@@ -51,11 +49,7 @@ describe('Link Student Controller', () => {
     const { sut, linkStudentPersonStub } = makeSut()
     const linkSpy = jest.spyOn(linkStudentPersonStub, 'link')
     await sut.handle(makeFakeRequest())
-    expect(linkSpy).toHaveBeenCalledWith(3, '0123456789')
-  })
-
-  test('Should import linkStudent protocols', () => {
-    expect(typeof LinkStudentProtocols).toBe('object')
+    expect(linkSpy).toHaveBeenCalledWith({ id: 3, registerCode: '0123456789' })
   })
 
   test('Should return 404 if id not found', async () => {
